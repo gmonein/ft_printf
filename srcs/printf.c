@@ -454,6 +454,7 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 	space_len = mod.padding - res_len;
 	if (zero_pad > 0)
 	{
+		mod.space = 0;
 		space_len--;
 	}
 	if (!mod.less)
@@ -464,8 +465,8 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 			space_len--;
 		}
 	}
-	if (mod.space)
-		buf_push_char(buf, ' ');
+//	if (mod.space)
+//		buf_push_char(buf, ' ');
 	if (mod.sign)
 		buf_push_char(buf, mod.sign);
 	if (mod.hash_res)
