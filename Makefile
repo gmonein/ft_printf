@@ -19,7 +19,7 @@ LIBFT = libft
 DIR_S = srcs
 DIR_O = obj
 HEADER = includes
-SOURCES = main.c
+SOURCES = printf.c
 
 SRCS = $(addprefix $(DIR_S)/,$(SOURCES))
 OBJS = $(addprefix $(DIR_O)/,$(SOURCES:.c=.o))
