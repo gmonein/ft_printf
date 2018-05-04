@@ -373,7 +373,7 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 			mod.padding -= 1;
 		}
 		type = FT_NUMBER;
-		if (var == 0 && mod.dot && !mod.precision)
+		if (var == 0 && ((mod.dot && !mod.precision) || mod.hash))
 			res = EMPTY_STRING;
 	}
 	else if (**format == 'x' || **format == 'X')
