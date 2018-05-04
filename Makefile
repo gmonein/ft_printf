@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-CC = clang
+CC = gcc
 
 NAME = libftprintf.a
 DFLAGS = #-fsanitize=address -g3
@@ -32,7 +32,7 @@ $(NAME): $(OBJS) $(LIBFT)
 	ranlib $(NAME)
 
 $(DIR_O)/%.o: $(DIR_S)/%.c
-	@mkdir -p obj
+	mkdir -p obj
 	$(CC) $(FLAGS) -I $(HEADER) -o $@ -c $<
 
 norme:
