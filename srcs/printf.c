@@ -451,10 +451,12 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 	else if (type == FT_HEX || type == FT_NUMBER)
 		if (mod.zero_pad)
 			zero_pad = mod.padding - res_len;
-	space_len = mod.padding - res_len -
-		(zero_pad > 0 ? zero_pad : 0);
+	space_len = mod.padding - res_len;
 	if (zero_pad > 0)
+	{
 		mod.space = 0;
+		space_len--;
+	}
 	if (!mod.less)
 	{
 		while (space_len > 0)
