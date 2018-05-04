@@ -14,8 +14,7 @@ NAME = libft.a
 
 HEADER = includes
 
-SRC = get_next_line.c \
-	ft_atoi.c \
+SRC = ft_atoi.c \
 	ft_bzero.c \
 	ft_double_sign.c \
 	ft_isalnum.c \
