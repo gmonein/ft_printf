@@ -5,6 +5,8 @@
 # include <stdarg.h>
 # include <errno.h>
 # include <stdio.h>
+#include <wchar.h>
+#include <locale.h>
 
 typedef struct	s_printf
 {

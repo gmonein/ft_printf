@@ -51,9 +51,9 @@ fclean: clean
 	@rm -f $(NAME)
 	@make fclean -C $(LIBFT)
 
-test: all
-	gcc ./libftprintf.a ./srcs/test.c
-	./a.out
+test: $(NAME)
+	make -C ../printf-unit-test/
+	../printf-unit-test/run_test
 
 re: fclean all
 

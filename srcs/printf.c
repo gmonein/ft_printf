@@ -17,7 +17,7 @@ char	*string_alloc(char *str)
 }
 
 #define STR_ZERO	"0"
-#define STR_ULLONG_MAX "9223372036854775807"
+#define STR_ULLONG_MAX "18446744073709551615"
 #define STR_LLONG_MIN "9223372036854775808"
 
 char	*char_alloc(char c)
@@ -26,6 +26,14 @@ char	*char_alloc(char c)
 	
 	res[0] = c;
 	return (res);
+}
+
+wchar_t	*lchar_alloc(wchar_t c)
+{
+	static wchar_t		res;
+
+	res = c;
+	return (&res);
 }
 
 char	*ultoa_buf(unsigned long nbr)
@@ -37,7 +45,7 @@ char	*ultoa_buf(unsigned long nbr)
 	res[41] = '\0';
 	if (nbr == 0)
 		return (STR_ZERO);
-	if (nbr == ULLONG_MAX)
+	if (nbr == ULONG_MAX)
 		return (STR_ULLONG_MAX);
 	while (nbr != 0)
 	{
@@ -102,6 +110,12 @@ char	*ltoa_buf(long long nbr, char *signe)
 	return (&res[i + 1]);
 }
 
+void	buf_empty(t_buf *buf)
+{
+	write(1, buf->str, buf->i);
+	buf->i = 0;
+}
+
 int		buf_push_str(t_buf *buf, char *str)
 {
 	char		*tmp;
@@ -135,19 +149,14 @@ int		buf_push_char(t_buf *buf, char c)
 	}
 	buf->str[buf->i] = c;
 	buf->i++;
-	buf->str[buf->i] = '\0';
 	return (0);
 }
 
 int		buf_push_strn(t_buf *buf, char *str, size_t n)
 {
 	char		*tmp;
-	size_t		len;
 
-	len = strlen(str);
-	if (n < len)
-		len = n;
-	while (len + buf->i >= buf->len)
+	while (n + buf->i > buf->len - 4)
 	{
 		tmp = buf->str;
 		buf->str = (char *)malloc(sizeof(char) * buf->len * 2);
@@ -156,7 +165,7 @@ int		buf_push_strn(t_buf *buf, char *str, size_t n)
 		free(tmp);
 	}
 	strncpy(&buf->str[buf->i], str, n);
-	buf->i += len;
+	buf->i += n;
 	return (0);
 
 }
@@ -250,7 +259,7 @@ void	do_modifier_signed(size_t *var, t_modifier mod)
 	else if (mod.j)
 		*var = *((intmax_t *)var);
 	else if (mod.z)
-		*var = *((size_t *)var);
+		*var = *((long long *)var);
 	else
 		*var = *((int *)var);
 }
@@ -268,10 +277,12 @@ void	do_modifier_unsigned(size_t *var, t_modifier mod)
 	else if (mod.j)
 		*var = *((intmax_t *)var);
 	else if (mod.z)
-		*var = *((size_t *)var);
+		*var = *((unsigned long long *)var);
 	else
 		*var = *((unsigned int *)var);
 }
+
+#define STR_ULONG_MAX_8 "1777777777777777777777"
 
 char	*ft_ltoa_hex(unsigned long long nbr, int size, int cap, int base)
 {
@@ -284,6 +295,8 @@ char	*ft_ltoa_hex(unsigned long long nbr, int size, int cap, int base)
 		size = -1;
 	if (nbr == 0 || (nbr == 4294967296 && size == 8))
 		return (STR_ZERO);
+	if (nbr == ULONG_MAX && base == 8)
+		return (STR_ULONG_MAX_8);
 	while (nbr && (size || size == -1))
 	{
 		if (cap)
@@ -321,10 +334,105 @@ void	print_padding(t_modifier *mod, int act_len,
 typedef enum		e_type
 {
 	FT_NUMBER,
+	FT_NONE,
+	FT_WCHAR,
+	FT_SWCHAR,
 	FT_HEX,
 	FT_CHAR,
 	FT_STRING
 }					t_type;
+
+int		spread_char(t_buf *buf, char c, int cnt)
+{
+	char	str[4];
+
+	if (cnt > 4)
+	{
+		str[0] = c;
+		str[1] = c;
+		str[2] = c;
+		str[3] = c;
+		while (cnt - 4 > 0)
+		{
+			buf_push_strn(buf, str, 4);
+			cnt -= 4;
+		}
+	}
+	while (cnt > 0)
+	{
+		buf_push_char(buf, c);
+		cnt--;
+	}
+	return (cnt);
+}
+
+int		ft_putwchar_buf(t_buf *buf, wchar_t chr)
+{
+	if (chr <= 0x7F)
+	{
+		buf_push_char(buf, chr);
+		return (1);
+	}
+	else if (chr <= 0x7FF)
+	{
+		buf_push_char(buf, (chr >> 6) | 0xC0);
+		buf_push_char(buf, (chr & 0x3F) | 0x80);
+		return (2);
+	}
+	else if (chr <= 0xFFFF)
+	{
+		buf_push_char(buf, (chr >> 12) | 0xE0);
+		buf_push_char(buf, ((chr >> 6) & 0x3F) | 0x80);
+		buf_push_char(buf, (chr & 0x3F) | 0x80);
+		return (3);
+	}
+	else if (chr <= 0x10FFFF)
+	{
+		buf_push_char(buf, (chr >> 18) | 0xF0);
+		buf_push_char(buf, ((chr >> 12) & 0x3F) | 0x80);
+		buf_push_char(buf, ((chr >> 6) & 0x3F) | 0x80);
+		buf_push_char(buf, (chr & 0x3F) | 0x80);
+		return (4);
+	}
+	return (0);
+}
+
+void	ft_putwstr_buf(t_buf *buf, wchar_t *chr)
+{
+	int		i;
+
+	i = 0;
+	while (chr[i])
+	{
+		ft_putwchar_buf(buf, chr[i]);
+		i++;
+	}
+}
+
+void	ft_putwstrn_buf(t_buf *buf, wchar_t *chr, size_t n)
+{
+	size_t	i;
+	int		j;
+
+	i = 0;
+	j = n;
+	while (i < n && j > 0)
+	{
+		j -= ft_putwchar_buf(buf, chr[i]);
+		i++;
+	}
+}
+
+
+int		ft_wstrlen(wchar_t *str)
+{
+	int		i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
 
 int		treat(const char **format, va_list ap, t_buf *buf)
 {
@@ -332,6 +440,7 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 	t_modifier		mod;
 	size_t			var;
 	t_type			type;
+	int				res_len;
 
 	*format += 1;
 	mod = get_convertion(format);
@@ -345,6 +454,7 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 		type = FT_NUMBER;
 		if (var == 0 && mod.dot && !mod.precision)
 			res = EMPTY_STRING;
+		res_len = strlen(res);
 	}
 	else if (**format == 'u' || **format == 'U')
 	{
@@ -358,15 +468,17 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 		type = FT_NUMBER;
 		if (var == 0 && mod.dot && !mod.precision)
 			res = EMPTY_STRING;
+		res_len = strlen(res);
 	}
 	else if (**format == 'o' || **format == 'O')
 	{
 		var = va_arg(ap, size_t);
+		if (**format == 'O')
+			mod.ll = 1;
 		do_modifier_unsigned(&var, mod);
-		res = ft_ltoa_hex(var, mod.padding, **format == 'o' ? 0 : 1, 8);
+		res = ft_ltoa_hex(var, 999, **format == 'o' ? 0 : 1, 8);
 		mod.space = 0;
 		mod.more = 0;
-		mod.less = 0;
 		if (mod.hash)
 		{
 			mod.hash_res = O_HASH_RES;
@@ -375,12 +487,13 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 		type = FT_NUMBER;
 		if (var == 0 && ((mod.dot && !mod.precision) || mod.hash))
 			res = EMPTY_STRING;
+		res_len = strlen(res);
 	}
 	else if (**format == 'x' || **format == 'X')
 	{
 		var = va_arg(ap, size_t);
-		res = ft_ltoa_hex(var, mod.j || mod.ll || mod.l ?
-				16 : 8, **format == 'x' ? 0 : 1, 16);
+		do_modifier_unsigned(&var, mod);
+		res = ft_ltoa_hex(var, 16, **format == 'x' ? 0 : 1, 16);
 		mod.more = 0;
 		if (mod.hash && var != 0)
 		{
@@ -390,15 +503,25 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 		type = FT_HEX;
 		if (var == 0 && mod.dot && !mod.precision)
 			res = EMPTY_STRING;
+		res_len = strlen(res);
+		mod.space = 0;
 	}
 	else if (**format == 'c' || **format == 'C')
 	{
 		var = va_arg(ap, size_t);
-		res = char_alloc(var);
+		if (**format == 'C' || mod.l || mod.ll)
+		{
+			type = FT_WCHAR;
+			res = lchar_alloc(var);
+			res_len = 1;
+		}
+		else
+		{
+			type = FT_CHAR;
+			res = char_alloc(var);
+			res_len = 1;
+		}
 		mod.space = 0;
-		if (var == 0)
-			buf_push_char(buf, '\0');
-		type = FT_CHAR;
 	}
 	else if (**format == 'p')
 	{
@@ -408,80 +531,98 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 		mod.padding -= 2;
 		mod.space = 0;
 		type = FT_HEX;
+		res_len = strlen(res);
+		if (mod.dot && mod.precision == 0 && var == 0)
+			res_len = 0;
+	}
+	else if (**format == 'S' || (**format == 's' && (mod.l || mod.ll)))
+	{
+		res = va_arg(ap, char *);
+		type = FT_SWCHAR;
+		mod.sign = 0;
+		mod.space = 0;
+		if (res == NULL)
+		{
+			res = NULL_STRING;
+			res_len = strlen(res);
+			type = FT_STRING;
+		}
+		else
+			res_len = ft_wstrlen((wchar_t *)res);
 	}
 	else if (**format == 's')
 	{
 		res = va_arg(ap, char *);
 		type = FT_STRING;
+		mod.sign = 0;
+		mod.space = 0;
 		if (res == NULL)
 			res = NULL_STRING;
+		res_len = strlen(res);
 	}
 	else if (**format == '%')
 	{
 		res = char_alloc('%');
 		mod.space = 0;
 		type = FT_CHAR;
+		res_len = strlen(res);
 	}
 	else
-		return (0);
+	{
+		if (!**format)
+			return (1);
+		res = char_alloc(**format);
+		mod.space = 0;
+		res_len = 1;
+		type = FT_NONE;
+	}
 	if (mod.less)
 		mod.zero_pad = 0;
 	if (mod.sign == '+' && !mod.more)
 		mod.sign = '\0';
 	if (mod.sign && mod.space)
 		mod.space = '\0';
+	if (mod.sign || mod.space)
+		mod.padding -= 1;
 
-	int		res_len;
 	int		space_len;
 	int		zero_pad;
 
-	res_len = strlen(res);
-	if (res_len == 0 && type == FT_CHAR)
-		res_len = 1;
 	zero_pad = 0;
-	if (mod.sign)
-		mod.padding -= 1;
 	if (mod.dot)
 	{
-		if (type == FT_STRING && mod.precision < res_len)
+		if ((type == FT_STRING || type == FT_SWCHAR) && mod.precision < res_len)
 			res_len = mod.precision;
 		else if (type == FT_HEX || type == FT_NUMBER)
 			zero_pad = mod.precision - res_len;
+		else if (mod.zero_pad && !mod.less)
+			zero_pad = mod.padding - res_len;
 	}
-	else if (type == FT_HEX || type == FT_NUMBER)
-		if (mod.zero_pad)
+	else if (mod.zero_pad > 0)
 			zero_pad = mod.padding - res_len;
 	space_len = mod.padding - res_len;
 	if (zero_pad > 0)
-	{
-		mod.space = 0;
-		space_len--;
-	}
+		space_len -= zero_pad;
+	if (mod.precision > mod.padding)
+		mod.padding = mod.precision;
 	if (!mod.less)
-	{
-		while (space_len > 0)
-		{
-			buf_push_char(buf, ' ');
-			space_len--;
-		}
-	}
-//	if (mod.space)
-//		buf_push_char(buf, ' ');
+		space_len = spread_char(buf, ' ', space_len);
+	if (mod.space)
+		buf_push_char(buf, ' ');
 	if (mod.sign)
 		buf_push_char(buf, mod.sign);
 	if (mod.hash_res)
 		buf_push_str(buf, mod.hash_res);
-	while (zero_pad > 0)
-	{
-		buf_push_char(buf, '0');
-		zero_pad--;
-	}
-	buf_push_strn(buf, res, res_len);
-	while (space_len > 0)
-	{
-		buf_push_char(buf, ' ');
-		space_len--;
-	}
+	spread_char(buf, '0', zero_pad);
+	if (type == FT_WCHAR)
+		ft_putwstrn_buf(buf, (wchar_t *)res, 1);
+	else if (type == FT_SWCHAR && mod.dot)
+		ft_putwstrn_buf(buf, (wchar_t *)res, res_len);
+	else if (type == FT_SWCHAR)
+		ft_putwstr_buf(buf, (wchar_t *)res);
+	else
+		buf_push_strn(buf, res, res_len);
+	spread_char(buf, ' ', space_len);
 	*format += 1;
 	return (1);
 }
@@ -490,21 +631,18 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 
 void	do_printf(const char *format, va_list ap, t_buf *buf)
 {
-	int			treated;
-
 	buf->str = (char *)malloc(sizeof(char) * BUF_LEN);
 	buf->len = BUF_LEN;
 	buf->i = 0;
 	while (*format)
 	{
 		if (*format == '%')
-			treated = treat(&format, ap, buf);
-		if (treated == 0)
+			treat(&format, ap, buf);
+		else
 		{
 			buf_push_char(buf, *format);
 			format++;
 		}
-		treated = 0;
 	}
 }
 
