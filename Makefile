@@ -19,7 +19,15 @@ LIBFT = libft
 DIR_S = srcs
 DIR_O = obj
 HEADER = includes
-SOURCES = printf.c
+SOURCES = \
+  buf.c \
+  char_alloc.c \
+  get_modifier.c \
+  itoa.c \
+  misc.c \
+  modifier.c \
+  printf.c \
+  wchar.c
 
 SRCS = $(addprefix $(DIR_S)/,$(SOURCES))
 OBJS = $(addprefix $(DIR_O)/,$(SOURCES:.c=.o))
