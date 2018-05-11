@@ -14,8 +14,7 @@ CC = gcc
 
 NAME = libftprintf.a
 DFLAGS = #-fsanitize=address -g3
-FLAGS = -Wall -Wextra $(DFLAGS)#-Werror
-LIBFT = libft
+FLAGS = -Wall -Wextra -Werror
 DIR_S = srcs
 DIR_O = obj
 HEADER = includes
@@ -26,7 +25,12 @@ SOURCES = \
   itoa.c \
   misc.c \
   modifier.c \
+  operator_one.c \
+  operator_three.c \
+  operator_two.c \
+  pas_main.c \
   printf.c \
+  libft.c \
   wchar.c
 
 SRCS = $(addprefix $(DIR_S)/,$(SOURCES))
@@ -34,30 +38,20 @@ OBJS = $(addprefix $(DIR_O)/,$(SOURCES:.c=.o))
 
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT)
-	@make -C $(LIBFT)
-	ar rc $(NAME) $(OBJS) $(LIBFT)/$(LIBFT).a
+$(NAME): $(OBJS) includes/ft_printf.h includes/ft_printf_struct.h
+	ar rc $(NAME) $(OBJS)
 	ranlib $(NAME)
 
 $(DIR_O)/%.o: $(DIR_S)/%.c
 	mkdir -p obj
 	$(CC) $(FLAGS) -I $(HEADER) -o $@ -c $<
 
-norme:
-	norminette ./libft/
-	@echo
-	norminette ./$(HEADER)/
-	@echo
-	norminette ./$(DIR_S)/
-
 clean:
 	@rm -f $(OBJS)
 	@rm -rf $(DIR_O)
-	@make clean -C $(LIBFT)
 
 fclean: clean
 	@rm -f $(NAME)
-	@make fclean -C $(LIBFT)
 
 test: $(NAME)
 	make -C ../printf-unit-test/

@@ -1,76 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_printf.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FT_PRINTF_H
 # define FT_PRINTF_H
 
-# include "libft.h"
 # include <stdarg.h>
 # include <errno.h>
 # include <stdio.h>
 # include <wchar.h>
 # include <locale.h>
 # include <limits.h>
-
-# define O_HASH_RES		"0"
-# define X_HASH_RES		"0x"
-# define XX_HASH_RES		"0X"
-# define EMPTY_STRING	""
-# define NULL_STRING		"(null)"
-
-# define STR_ULONG_MAX_8 "1777777777777777777777"
-# define STR_ZERO	"0"
-# define STR_ULLONG_MAX "18446744073709551615"
-# define STR_LLONG_MIN "9223372036854775808"
-
-# define BUF_LEN		4096
-
-typedef struct		s_modifier
-{
-	char			l;
-	char			ll;
-	char			h;
-	char			hh;
-	char			j;
-	char			z;
-	char			x;
-	char			xx;
-	char			hash;
-	char			padding;
-	char			zero_pad;
-	char			precision;
-	char			dot;
-	char			more;
-	char			less;
-	char			space;
-	char			sign;
-	char			*hash_res;
-}					t_modifier;
-
-typedef enum		e_type
-{
-	FT_NUMBER,
-	FT_NONE,
-	FT_WCHAR,
-	FT_SWCHAR,
-	FT_HEX,
-	FT_CHAR,
-	FT_STRING
-}					t_type;
-
-typedef struct		s_res
-{
-	int				res_len;
-	char			*res;
-	size_t			var;
-	t_type			type;
-	int				space_len;
-	int				zero_pad;
-}					t_res;
-
-typedef struct		s_buf
-{
-	char			*str;
-	size_t			len;
-	size_t			i;
-}					t_buf;
+# include <stdlib.h>
+# include <unistd.h>
+# include "ft_printf_struct.h"
 
 int		treat(const char **format, va_list ap, t_buf *buf);
 
@@ -98,10 +49,9 @@ void	get_padding(const char **format, t_modifier *mod);
 void	do_modifier_unsigned(size_t *var, t_modifier mod);
 void	do_modifier_signed(size_t *var, t_modifier mod);
 
-t_modifier	get_convertion(const char **format);
+void	get_convertion(const char **format, t_modifier *mod);
 
 int		is_digit(char c);
-
 
 void	do_d(const char **format, va_list ap, t_res *res, t_modifier *mod);
 void	do_bigd(const char **format, va_list ap, t_res *res, t_modifier *mod);
@@ -115,8 +65,14 @@ void	do_p(const char **format, va_list ap, t_res *res, t_modifier *mod);
 void	do_bigs(const char **format, va_list ap, t_res *res, t_modifier *mod);
 void	do_s(const char **format, va_list ap, t_res *res, t_modifier *mod);
 void	do_s(const char **format, va_list ap, t_res *res, t_modifier *mod);
-void	do_percent(const char **format, va_list ap, t_res *res, t_modifier *mod);
+void	do_percent(const char **forma, va_list ap, t_res *res, t_modifier *mod);
 
 int		ft_printf(const char *format, ...);
 char	*ft_sprintf(const char *format, ...);
+void	*ft_bzero(void *ptr, size_t num);
+char	*ft_strncpy(char *dst, char *src, size_t n);
+char	*ft_strcpy(char *dest, const char *src);
+size_t	ft_strlen(const char *str);
+int		ft_atoi(const char *str);
+
 #endif

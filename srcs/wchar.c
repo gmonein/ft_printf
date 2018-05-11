@@ -1,34 +1,43 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wchar.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
 
 int		ft_putwchar_buf(t_buf *buf, wchar_t chr)
 {
-	if (chr <= 0x7F)
-	{
+	int		ret;
+
+	ret = 0;
+	if (chr <= 0x7F && (ret = 1))
 		buf_push_char(buf, chr);
-		return (1);
-	}
-	else if (chr <= 0x7FF)
+	else if (chr <= 0x7FF && (ret = 2))
 	{
 		buf_push_char(buf, (chr >> 6) | 0xC0);
 		buf_push_char(buf, (chr & 0x3F) | 0x80);
-		return (2);
 	}
-	else if (chr <= 0xFFFF)
+	else if (chr <= 0xFFFF && (ret = 3))
 	{
 		buf_push_char(buf, (chr >> 12) | 0xE0);
 		buf_push_char(buf, ((chr >> 6) & 0x3F) | 0x80);
 		buf_push_char(buf, (chr & 0x3F) | 0x80);
-		return (3);
 	}
-	else if (chr <= 0x10FFFF)
+	else if (chr <= 0x10FFFF && (ret = 4))
 	{
 		buf_push_char(buf, (chr >> 18) | 0xF0);
 		buf_push_char(buf, ((chr >> 12) & 0x3F) | 0x80);
 		buf_push_char(buf, ((chr >> 6) & 0x3F) | 0x80);
 		buf_push_char(buf, (chr & 0x3F) | 0x80);
-		return (4);
 	}
-	return (0);
+	return (ret);
 }
 
 void	ft_putwstr_buf(t_buf *buf, wchar_t *chr)

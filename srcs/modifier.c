@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   modifier.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
 
 void	do_modifier_signed(size_t *var, t_modifier mod)
@@ -45,14 +57,14 @@ void	get_padding(const char **format, t_modifier *mod)
 		mod->zero_pad = 1;
 	while (is_digit((*format)[i]))
 		i++;
-	mod->padding = atoi(*format);
+	mod->padding = ft_atoi(*format);
 	*format = &(*format)[i];
 }
 
-void		get_precision(const char **format, t_modifier *mod)
+void	get_precision(const char **format, t_modifier *mod)
 {
 	*format += 1;
-	mod->precision = atoi(*format);
+	mod->precision = ft_atoi(*format);
 	mod->dot = 1;
 	while (is_digit(**format))
 		*format += 1;

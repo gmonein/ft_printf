@@ -1,4 +1,16 @@
-# include "ft_printf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_modifier.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ft_printf.h"
 
 int		get_convertion_bis(const char **format, t_modifier *mod)
 {
@@ -21,31 +33,28 @@ int		get_convertion_bis(const char **format, t_modifier *mod)
 	return (1);
 }
 
-t_modifier	get_convertion(const char **format)
+void	get_convertion(const char **format, t_modifier *res)
 {
-	t_modifier	res;
-
-	bzero(&res, sizeof(res));
+	ft_bzero(res, sizeof(t_modifier));
 	while (1)
 	{
 		if (**format == 'h' && (*format += 1))
 		{
 			if (**format == 'h' && (*format += 1))
-				res.hh = 1;
+				res->hh = 1;
 			else
-				res.h = 1;
+				res->h = 1;
 		}
 		else if (**format == 'l' && (*format += 1))
 		{
 			if (**format == 'l' && (*format += 1))
-				res.ll = 1;
+				res->ll = 1;
 			else
-				res.l = 1;
+				res->l = 1;
 		}
 		else if (**format == 'j' && (*format += 1))
-			res.j = 1;
-		else if (!get_convertion_bis(format, &res))
+			res->j = 1;
+		else if (!get_convertion_bis(format, res))
 			break ;
 	}
-	return (res);
 }

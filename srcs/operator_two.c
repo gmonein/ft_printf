@@ -1,4 +1,16 @@
-# include "ft_printf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   operator_two.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ft_printf.h"
 
 void	do_bigo(const char **format, va_list ap, t_res *res, t_modifier *mod)
 {
@@ -17,7 +29,7 @@ void	do_bigo(const char **format, va_list ap, t_res *res, t_modifier *mod)
 	res->type = FT_NUMBER;
 	if (res->var == 0 && ((mod->dot && !mod->precision) || mod->hash))
 		res->res = EMPTY_STRING;
-	res->res_len = strlen(res->res);
+	res->res_len = ft_strlen(res->res);
 }
 
 void	do_x(const char **format, va_list ap, t_res *res, t_modifier *mod)
@@ -35,7 +47,7 @@ void	do_x(const char **format, va_list ap, t_res *res, t_modifier *mod)
 	res->type = FT_HEX;
 	if (res->var == 0 && mod->dot && !mod->precision)
 		res->res = EMPTY_STRING;
-	res->res_len = strlen(res->res);
+	res->res_len = ft_strlen(res->res);
 	mod->space = 0;
 }
 
@@ -65,7 +77,7 @@ void	do_p(const char **format, va_list ap, t_res *res, t_modifier *mod)
 	mod->padding -= 2;
 	mod->space = 0;
 	res->type = FT_HEX;
-	res->res_len = strlen(res->res);
+	res->res_len = ft_strlen(res->res);
 	if (mod->dot && mod->precision == 0 && res->var == 0)
 		res->res_len = 0;
 }
@@ -80,7 +92,7 @@ void	do_bigs(const char **format, va_list ap, t_res *res, t_modifier *mod)
 	if (res->res == NULL)
 	{
 		res->res = NULL_STRING;
-		res->res_len = strlen(res->res);
+		res->res_len = ft_strlen(res->res);
 		res->type = FT_STRING;
 	}
 	else

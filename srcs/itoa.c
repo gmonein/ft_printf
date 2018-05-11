@@ -1,4 +1,16 @@
-# include "ft_printf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   itoa.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ft_printf.h"
 
 char	*ultoa_buf(unsigned long nbr)
 {
@@ -25,13 +37,10 @@ char	*ltoa_buf(long long nbr, char *signe)
 {
 	static char		res[42];
 	int				i;
-	int				sign;
 
 	i = 40;
 	res[41] = '\0';
-	sign = 0;
-	if (nbr < 0 && (nbr *= -1))
-		sign = 1;
+	*signe = nbr < 0 && (nbr *= -1) ? '-' : '+';
 	if (nbr == 0)
 	{
 		*signe = '+';
@@ -48,7 +57,6 @@ char	*ltoa_buf(long long nbr, char *signe)
 		i--;
 		nbr /= 10;
 	}
-	*signe = sign ? '-' : '+';
 	return (&res[i + 1]);
 }
 
@@ -77,4 +85,3 @@ char	*ft_ltoa_hex(unsigned long long nbr, int size, int cap, int base)
 	}
 	return (&res[i + 1]);
 }
-

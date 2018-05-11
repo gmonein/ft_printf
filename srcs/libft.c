@@ -12,26 +12,78 @@
 
 #include "ft_printf.h"
 
-char	*string_alloc(char *str)
+size_t	ft_strlen(const char *str)
 {
-	static char		res[42];
+	size_t		i;
 
-	ft_strcpy(res, str);
-	return (res);
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
 }
 
-char	*char_alloc(char c)
+char	*ft_strcpy(char *dest, const char *src)
 {
-	static char		res[2] = "\0\0";
+	int		i;
 
-	res[0] = c;
-	return (res);
+	i = 0;
+	while (src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
+	return (dest);
 }
 
-wchar_t	*lchar_alloc(wchar_t c)
+char	*ft_strncpy(char *dst, char *src, size_t n)
 {
-	static wchar_t		res;
+	size_t		i;
+	size_t		j;
 
-	res = c;
-	return (&res);
+	j = n;
+	while (j--)
+		((unsigned char *)dst)[j] = '\0';
+	i = 0;
+	while (n-- && src[i])
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	return (dst);
+}
+
+void	*ft_bzero(void *ptr, size_t num)
+{
+	unsigned char	*fresh;
+	int				value;
+
+	value = 0;
+	fresh = (unsigned char *)ptr;
+	while (num)
+	{
+		*fresh = (unsigned char)value;
+		num--;
+		if (num)
+			fresh++;
+	}
+	return (ptr);
+}
+
+int		ft_atoi(const char *str)
+{
+	int		res;
+	int		sign;
+
+	res = 0;
+	sign = *str == '-' ? -1 : 1;
+	if (*str == '-' || *str == '+')
+		str++;
+	while (*str >= '0' && *str <= '9')
+	{
+		res *= 10;
+		res += *str - '0';
+		str++;
+	}
+	return (res * sign);
 }

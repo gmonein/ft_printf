@@ -1,4 +1,16 @@
-# include "ft_printf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   buf.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "ft_printf.h"
 
 int		spread_char(t_buf *buf, char c, int cnt)
 {
@@ -29,16 +41,16 @@ int		buf_push_str(t_buf *buf, char *str)
 	char		*tmp;
 	size_t		len;
 
-	len = strlen(str);
+	len = ft_strlen(str);
 	while (len + buf->i >= buf->len)
 	{
 		tmp = buf->str;
 		buf->str = (char *)malloc(sizeof(char) * buf->len * 2);
-		strncpy(buf->str, tmp, buf->len);
+		ft_strncpy(buf->str, tmp, buf->len);
 		buf->len *= 2;
 		free(tmp);
 	}
-	strcpy(&buf->str[buf->i], str);
+	ft_strcpy(&buf->str[buf->i], str);
 	buf->i += len;
 	return (0);
 }
@@ -51,7 +63,7 @@ int		buf_push_char(t_buf *buf, char c)
 	{
 		tmp = buf->str;
 		buf->str = (char *)malloc(sizeof(char) * buf->len * 2);
-		strncpy(buf->str, tmp, buf->len);
+		ft_strncpy(buf->str, tmp, buf->len);
 		buf->len *= 2;
 		free(tmp);
 	}
@@ -68,12 +80,11 @@ int		buf_push_strn(t_buf *buf, char *str, size_t n)
 	{
 		tmp = buf->str;
 		buf->str = (char *)malloc(sizeof(char) * buf->len * 2);
-		strncpy(buf->str, tmp, buf->len);
+		ft_strncpy(buf->str, tmp, buf->len);
 		buf->len *= 2;
 		free(tmp);
 	}
-	strncpy(&buf->str[buf->i], str, n);
+	ft_strncpy(&buf->str[buf->i], str, n);
 	buf->i += n;
 	return (0);
 }
-

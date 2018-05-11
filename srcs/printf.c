@@ -1,6 +1,18 @@
-# include "ft_printf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   wchar.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gmonein <gmonein@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/09/28 20:42:49 by gmonein           #+#    #+#             */
+/*   Updated: 2018/03/06 14:31:23 by gmonein          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void (*g_fct[CHAR_MAX])(const char **, va_list ap, t_res *res, t_modifier *mod) =
+#include "ft_printf.h"
+
+void (*g_fct[CHAR_MAX])(const char **, va_list, t_res *, t_modifier *) =
 {
 	['d'] = do_d,
 	['D'] = do_bigd,
@@ -73,7 +85,7 @@ void	print(const char **format, t_buf *buf, t_modifier *mod, t_res *res)
 			res->zero_pad = mod->padding - res->res_len;
 	}
 	else if (mod->zero_pad > 0)
-			res->zero_pad = mod->padding - res->res_len;
+		res->zero_pad = mod->padding - res->res_len;
 	res->space_len = mod->padding - res->res_len;
 	print_bis(format, buf, mod, res);
 }
@@ -84,7 +96,7 @@ int		treat(const char **format, va_list ap, t_buf *buf)
 	t_res			m_res;
 
 	*format += 1;
-	mod = get_convertion(format);
+	get_convertion(format, &mod);
 	if (g_fct[(int)**format])
 		g_fct[(int)**format](format, ap, &m_res, &mod);
 	else
